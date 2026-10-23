@@ -10,7 +10,7 @@ function makeCanvas(className) {
     return { canvas, ctx };
 }
 function fit(canvas, ctx) {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(2, window.devicePixelRatio || 1); // cap to keep the canvas small on 3x phones
     canvas.width = innerWidth * dpr;
     canvas.height = innerHeight * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -33,7 +33,16 @@ export function startSnow() {
         }));
     };
     populate();
-    addEventListener("resize", populate);
+    // iOS fires resize whenever the address bar shows/hides while scrolling; only rebuild when the width changes
+    let lastWidth = innerWidth;
+    addEventListener("resize", () => {
+        if (innerWidth !== lastWidth) {
+            lastWidth = innerWidth;
+            populate();
+        }
+        else
+            fit(canvas, ctx);
+    });
     let last = performance.now();
     const frame = (now) => {
         const dt = Math.min(0.05, (now - last) / 1000);

@@ -13,18 +13,6 @@ It is a static site with no backend, so it can be hosted on GitHub Pages.
 
 The passphrase is shipped in `calendar-data.js` alongside the encrypted data, so this keeps the films out of casual view but is not real protection against someone reading the page source.
 
-## Project layout
-
-| Path | Purpose |
-|---|---|
-| `index.html` | Page markup and styles |
-| `src/main.ts` | Calendar logic: unlocking, decryption, dialog |
-| `src/effects.ts` | Snow and sparkle canvas effects |
-| `dist/` | Compiled JavaScript served by the page (committed so GitHub Pages can serve it) |
-| `encrypt.ts` | Builds `calendar-data.js` from `messages.txt` |
-| `calendar-data.js` | Generated: passphrase and 24 encrypted films |
-| `messages.txt` | Plaintext film list (git-ignored, so films are not spoiled in the repo) |
-
 ## Setup
 
 ```sh
