@@ -129,7 +129,7 @@ async function openDoor(n, li) {
     if (reduceMotion || !firstTime)
         show();
     else
-        setTimeout(show, 450);
+        setTimeout(show, 1500);
 }
 el("close").addEventListener("click", () => dlg.close());
 dlg.addEventListener("click", (e) => { if (e.target === dlg)

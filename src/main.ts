@@ -137,7 +137,7 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
     dlg.showModal();
   };
   if (reduceMotion || !firstTime) show();
-  else setTimeout(show, 450);
+  else setTimeout(show, 1500);
 }
 
 el("close").addEventListener("click", () => dlg.close());

@@ -4,6 +4,8 @@ A Christmas film advent calendar website. There are 24 doors, one for each day f
 
 It is a static site with no backend, so it can be hosted on GitHub Pages.
 
+> https://leearthur.github.io/xmas-movie-calendar
+
 ## How it works
 
 - Door *n* unlocks in December on or after day *n*, based on the visitor's device clock. Opened doors are remembered in the browser's `localStorage`.
