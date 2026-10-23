@@ -14,7 +14,8 @@
 html,body{margin:0}
 body{
   min-height:100dvh; color:var(--snow); font-family:var(--serif);
-  background:radial-gradient(ellipse at 50% -10%,#24376a 0%,var(--night) 45%,var(--night2) 100%) fixed;
+  /* cinema velvet: deep curtain red fading to a dark auditorium */
+  background:radial-gradient(ellipse at 50% -10%,#6b1426 0%,#35091a 42%,#12050a 100%) fixed;
   padding:0 1rem max(2rem,env(safe-area-inset-bottom));
 }
 header,#grid{position:relative;z-index:1}
@@ -34,7 +35,20 @@ header,#grid{position:relative;z-index:1}
 }
 @keyframes twinkle{from{filter:brightness(.8)}to{filter:brightness(1.25)}}
 
-header{text-align:center;margin:0 auto 1.5rem;max-width:34rem}
+header{text-align:center;margin:0 auto 2.2rem;max-width:34rem}
+/* cinema marquee with a row of chasing bulbs top and bottom */
+.marquee{
+  position:relative;padding:1.8rem 1rem 1.5rem;border:3px solid var(--brass);border-radius:.6rem;
+  background:#1b0a10;box-shadow:0 0 26px rgba(230,184,80,.35),inset 0 0 22px rgba(0,0,0,.65);
+}
+.marquee::before,.marquee::after{
+  content:"";position:absolute;left:.6rem;right:.6rem;height:10px;
+  background:radial-gradient(circle,#fff0bf 0 3px,rgba(230,184,80,.45) 4px,transparent 5px) 0 0/20px 10px repeat-x;
+  animation:twinkle 1.6s ease-in-out infinite alternate;
+}
+.marquee::before{top:.4rem}
+.marquee::after{bottom:.4rem;animation-delay:.8s}
+.now{margin:0 0 .3rem;font:600 .8rem/1 var(--serif);letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
 h1{font-size:clamp(1.8rem,7vw,2.9rem);font-weight:600;line-height:1.1;margin:0 0 .5rem;font-style:italic}
 header p{margin:0;opacity:.85;line-height:1.5}
 
@@ -43,9 +57,10 @@ header p{margin:0;opacity:.85;line-height:1.5}
 .cell{aspect-ratio:1/1.1;perspective:600px;position:relative}
 .inside{
   position:absolute;inset:0;border-radius:.5rem;display:grid;place-items:center;font-size:1.8rem;
-  background:radial-gradient(circle,#fff3c4 0%,var(--brass) 75%);box-shadow:inset 0 0 12px rgba(0,0,0,.35);
+  /* the lit cinema screen revealed behind an open door */
+  background:radial-gradient(circle,#4a1a24 0%,#1b0a10 80%);box-shadow:inset 0 0 14px rgba(0,0,0,.6),inset 0 0 0 2px rgba(230,184,80,.5);
 }
-/* each door is a wrapped present: ribbon cross over a coloured box */
+/* each door is a clapperboard: striped clapper arm across the top of a coloured slate */
 .door{
   position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;border-radius:.5rem;
   color:#fff;font:700 clamp(1.3rem,5vw,1.9rem)/1 var(--serif);text-shadow:0 1px 3px rgba(0,0,0,.7);
@@ -56,9 +71,13 @@ header p{margin:0;opacity:.85;line-height:1.5}
 .door::before{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:
-    linear-gradient(var(--r),var(--r)) center/16% 100% no-repeat,
-    linear-gradient(var(--r),var(--r)) center/100% 16% no-repeat;
-  --r:rgba(255,226,140,.55);
+    /* chalk lines on the slate */
+    linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)) center 70%/70% 2px no-repeat,
+    linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)) center 84%/70% 2px no-repeat,
+    /* shadow where the clapper arm meets the slate */
+    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)) 0 17%/100% 3px no-repeat,
+    /* clapper arm: black bar with thin cream diagonal stripes */
+    repeating-linear-gradient(-60deg,#15151a 0 15px,#ece4d0 15px 20px) top/100% 17% no-repeat;
 }
 .door::after{
   content:attr(data-n);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
@@ -72,10 +91,10 @@ header p{margin:0;opacity:.85;line-height:1.5}
 .cell:nth-child(4n) .door{--c:#2a6f5c}
 .cell:nth-child(8n+3) .door{--c:var(--gold)}
 .cell.locked .door{filter:saturate(.45) brightness(.7)}
-/* door number sits behind the clapper icon */
+/* the door number glows on the screen behind the door */
 .inside::before{
   content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;
-  font:700 clamp(2.4rem,9vw,4.2rem)/1 var(--serif);color:rgba(125,26,43,.55);
+  font:700 clamp(2.4rem,9vw,4.2rem)/1 var(--serif);color:rgba(255,226,140,.8);text-shadow:0 0 14px rgba(230,184,80,.6);
 }
 .inside{z-index:0}
 .cell.open .inside{cursor:pointer}
@@ -92,7 +111,12 @@ dialog{
   background:var(--snow);box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
 dialog::backdrop{background:rgba(8,12,30,.78)}
-.stripe{height:12px;background:repeating-linear-gradient(-45deg,var(--red) 0 12px,#fff 12px 24px)}
+/* the dialog is a cinema ticket */
+.stripe{
+  padding:.55rem 1rem;background:var(--red);color:#ffe9a8;text-align:center;
+  font:700 .72rem/1 var(--serif);letter-spacing:.3em;text-transform:uppercase;
+  border-bottom:3px dashed rgba(255,233,168,.7);
+}
 .card{padding:1.4rem 1.5rem 1.5rem;text-align:center}
 .day{font-size:1rem;color:var(--pine);font-weight:600}
 .card h2{font-size:clamp(1.6rem,7vw,2.1rem);line-height:1.15;margin:.4rem 0 .2rem;color:var(--red);font-style:italic}
@@ -116,19 +140,23 @@ dialog::backdrop{background:rgba(8,12,30,.78)}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){
   .door{transition:none}.cell.shake .door{animation:none}#toast{transition:none}.lights{animation:none}
+  .marquee::before,.marquee::after{animation:none}
 }
 </style>
 </head>
 <body>
 <div class="lights" aria-hidden="true"></div>
 <header>
-  <h1>Christmas Film Advent Calendar 2026</h1>
-  <p>Open tonight's door to find out what we're watching.</p>
+  <div class="marquee">
+    <p class="now">Now showing</p>
+    <h1>Christmas Film Advent Calendar 2026</h1>
+    <p>Open tonight's door to find out what we're watching.</p>
+  </div>
 </header>
 <ol id="grid"></ol>
 
 <dialog id="dlg" aria-labelledby="filmTitle">
-  <div class="stripe"></div>
+  <div class="stripe">Admit one · Christmas film night</div>
   <div class="card">
     <div class="day" id="dlgDay"></div>
     <h2 id="filmTitle"></h2>
