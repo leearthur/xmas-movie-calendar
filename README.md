@@ -9,7 +9,7 @@ It is a static site with no backend, so it can be hosted on GitHub Pages.
 - Door *n* unlocks in December on or after day *n*, based on the visitor's device clock. Opened doors are remembered in the browser's `localStorage`.
 - The doors appear in a fixed shuffled order, the same for everyone.
 - Film details are stored encrypted (AES-256-GCM) in `calendar-data.js` and decrypted in the browser with the Web Crypto API when a door is opened.
-- The page has snow and a sparkle effect when a door opens, and respects `prefers-reduced-motion`.
+- The page has snow and a sparkle effect when a door opens, and respects `prefers-reduced-motion` (the snow becomes slower and sparser, and the sparkle is skipped).
 
 The passphrase is shipped in `calendar-data.js` alongside the encrypted data, so this keeps the films out of casual view but is not real protection against someone reading the page source.
 

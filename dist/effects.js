@@ -16,19 +16,19 @@ function fit(canvas, ctx) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 export function startSnow() {
-    if (reduceMotion())
-        return;
+    // With reduced motion (e.g. iOS Reduce Motion) keep the snow but make it calm: fewer, slower flakes with little sway
+    const calm = reduceMotion() ? 0.35 : 1;
     const { canvas, ctx } = makeCanvas("fx-snow");
     let flakes = [];
     const populate = () => {
         fit(canvas, ctx);
-        const count = Math.min(120, Math.round((innerWidth * innerHeight) / 12000));
+        const count = Math.min(120, Math.round((innerWidth * innerHeight) / 12000 * (calm < 1 ? 0.6 : 1)));
         flakes = Array.from({ length: count }, () => ({
             x: Math.random() * innerWidth,
             y: Math.random() * innerHeight,
             r: 1 + Math.random() * 2.6,
-            speed: 18 + Math.random() * 32, // px per second
-            sway: 8 + Math.random() * 18,
+            speed: (18 + Math.random() * 32) * calm, // px per second
+            sway: (8 + Math.random() * 18) * calm,
             phase: Math.random() * Math.PI * 2,
         }));
     };
