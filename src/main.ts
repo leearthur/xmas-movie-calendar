@@ -119,6 +119,9 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
   }
   const firstTime = !opened.has(n);
   li.classList.add("open");
+  // light up only the door that was just opened
+  grid.querySelectorAll(".cell.lit").forEach((c) => c.classList.remove("lit"));
+  li.classList.add("lit");
   opened.add(n);
   save();
   if (firstTime) {
