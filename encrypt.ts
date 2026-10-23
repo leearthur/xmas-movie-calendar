@@ -1,6 +1,12 @@
 // Usage: npm run encrypt   (reads messages.txt, writes calendar-data.js)
-// Change this passphrase to anything you like, then re-run.
-const PASSPHRASE: string = process.env.PASSPHRASE ?? "change-this-passphrase";
+// A passphrase is required: set the PASSPHRASE environment variable (or pass it as the first argument).
+//   PowerShell: $env:PASSPHRASE="your-passphrase"; npm run encrypt
+//   bash:       PASSPHRASE="your-passphrase" npm run encrypt
+const PASSPHRASE: string = (process.env.PASSPHRASE ?? process.argv[2] ?? "").trim();
+if (!PASSPHRASE) {
+  console.error("A passphrase is required. Set the PASSPHRASE environment variable, e.g. PASSPHRASE=\"your-passphrase\" npm run encrypt");
+  process.exit(1);
+}
 
 import * as crypto from "node:crypto";
 import * as fs from "node:fs";
