@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Christmas Film Advent Calendar 2026</title>
+<style>
+:root{
+  --night:#12203a; --night2:#0b1326; --snow:#f6f2ea; --brass:#e6b850;
+  --red:#b3202f; --pine:#1f6b45; --gold:#c98a2b; --berry:#7d1a2b; --ink:#2a2118;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  min-height:100dvh; color:var(--snow); font-family:var(--serif);
+  background:radial-gradient(ellipse at 50% -10%,#24376a 0%,var(--night) 45%,var(--night2) 100%) fixed;
+  padding:0 1rem max(2rem,env(safe-area-inset-bottom));
+}
+header,#grid{position:relative;z-index:1}
+
+/* string of fairy lights */
+.lights{
+  height:34px;margin:0 -1rem 1rem;padding-top:env(safe-area-inset-top);box-sizing:content-box;
+  background:
+    radial-gradient(circle at 14px 20px,#ff5566 0 4px,rgba(255,85,102,.4) 5px,transparent 12px),
+    radial-gradient(circle at 38px 20px,#ffd25e 0 4px,rgba(255,210,94,.4) 5px,transparent 12px),
+    radial-gradient(circle at 62px 20px,#59d58a 0 4px,rgba(89,213,138,.4) 5px,transparent 12px),
+    radial-gradient(circle at 86px 20px,#6fb4ff 0 4px,rgba(111,180,255,.4) 5px,transparent 12px),
+    linear-gradient(#050914,#050914) 0 8px/100% 2px no-repeat;
+  background-size:96px 34px,96px 34px,96px 34px,96px 34px,100% 34px;
+  background-repeat:repeat-x,repeat-x,repeat-x,repeat-x,no-repeat;
+  animation:twinkle 3.5s ease-in-out infinite alternate;
+}
+@keyframes twinkle{from{filter:brightness(.8)}to{filter:brightness(1.25)}}
+
+header{text-align:center;margin:0 auto 1.5rem;max-width:34rem}
+h1{font-size:clamp(1.8rem,7vw,2.9rem);font-weight:600;line-height:1.1;margin:0 0 .5rem;font-style:italic}
+header p{margin:0;opacity:.85;line-height:1.5}
+
+#grid{list-style:none;margin:0 auto;padding:0;max-width:46rem;display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media (min-width:640px){#grid{grid-template-columns:repeat(6,1fr);gap:1rem}}
+.cell{aspect-ratio:1/1.1;perspective:600px;position:relative}
+.inside{
+  position:absolute;inset:0;border-radius:.5rem;display:grid;place-items:center;font-size:1.8rem;
+  background:radial-gradient(circle,#fff3c4 0%,var(--brass) 75%);box-shadow:inset 0 0 12px rgba(0,0,0,.35);
+}
+/* each door is a wrapped present: ribbon cross over a coloured box */
+.door{
+  position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;border-radius:.5rem;
+  color:#fff;font:700 clamp(1.3rem,5vw,1.9rem)/1 var(--serif);text-shadow:0 1px 3px rgba(0,0,0,.7);
+  background:var(--c);transform-origin:left center;transition:transform .7s cubic-bezier(.3,.7,.2,1);
+  box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.16);
+  -webkit-tap-highlight-color:transparent;
+}
+.door::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    linear-gradient(var(--r),var(--r)) center/16% 100% no-repeat,
+    linear-gradient(var(--r),var(--r)) center/100% 16% no-repeat;
+  --r:rgba(255,226,140,.55);
+}
+.door::after{
+  content:attr(data-n);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  min-width:2.1em;height:2.1em;padding:0 .3em;display:grid;place-items:center;border-radius:1.1em;
+  background:rgba(12,18,38,.82);box-shadow:0 0 0 2px rgba(255,226,140,.8);font-size:.62em;text-shadow:none;
+}
+.door:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+.cell:nth-child(4n+1) .door{--c:var(--red)}
+.cell:nth-child(4n+2) .door{--c:var(--pine)}
+.cell:nth-child(4n+3) .door{--c:var(--berry)}
+.cell:nth-child(4n) .door{--c:#2a6f5c}
+.cell:nth-child(8n+3) .door{--c:var(--gold)}
+.cell.locked .door{filter:saturate(.45) brightness(.7)}
+/* door number sits behind the clapper icon */
+.inside::before{
+  content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;
+  font:700 clamp(2.4rem,9vw,4.2rem)/1 var(--serif);color:rgba(125,26,43,.55);
+}
+.inside{z-index:0}
+.cell.open .inside{cursor:pointer}
+.cell.open .door{transform:rotateY(-75deg)}
+.cell.shake .door{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.fx-snow{z-index:0}
+.fx-sparkle{z-index:2}
+
+dialog{
+  border:0;border-radius:.9rem;padding:0;width:min(92vw,26rem);color:var(--ink);overflow:hidden;
+  background:var(--snow);box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+dialog::backdrop{background:rgba(8,12,30,.78)}
+.stripe{height:12px;background:repeating-linear-gradient(-45deg,var(--red) 0 12px,#fff 12px 24px)}
+.card{padding:1.4rem 1.5rem 1.5rem;text-align:center}
+.day{font-size:1rem;color:var(--pine);font-weight:600}
+.card h2{font-size:clamp(1.6rem,7vw,2.1rem);line-height:1.15;margin:.4rem 0 .2rem;color:var(--red);font-style:italic}
+.year{margin:0 0 1.2rem;font-size:1.15rem;opacity:.75}
+.facts{margin:0 0 1.4rem;display:grid;gap:.6rem;text-align:left}
+.facts div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+  padding:.55rem .9rem;border-radius:.5rem;background:#fff;border:1px solid #e3d8c3}
+.facts dt{font-size:.95rem;opacity:.7}
+.facts dd{margin:0;font-weight:700;font-size:1.15rem;text-align:right}
+#filmRating{color:#9a6a00}
+.card button{
+  font:inherit;font-size:1rem;padding:.7rem 1.6rem;min-height:44px;border:0;border-radius:2rem;
+  background:var(--pine);color:var(--snow);cursor:pointer;
+}
+.card button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+#toast{
+  position:fixed;left:50%;bottom:max(1.5rem,env(safe-area-inset-bottom));transform:translate(-50%,2rem);z-index:3;
+  background:var(--snow);color:var(--ink);padding:.7rem 1.1rem;border-radius:2rem;opacity:0;
+  transition:.3s;pointer-events:none;max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){
+  .door{transition:none}.cell.shake .door{animation:none}#toast{transition:none}.lights{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="lights" aria-hidden="true"></div>
+<header>
+  <h1>Christmas Film Advent Calendar 2026</h1>
+  <p>Open tonight's door to find out what we're watching.</p>
+</header>
+<ol id="grid"></ol>
+
+<dialog id="dlg" aria-labelledby="filmTitle">
+  <div class="stripe"></div>
+  <div class="card">
+    <div class="day" id="dlgDay"></div>
+    <h2 id="filmTitle"></h2>
+    <p class="year" id="filmYear"></p>
+    <dl class="facts">
+      <div><dt>IMDb rating</dt><dd id="filmRating"></dd></div>
+      <div><dt>Watch on</dt><dd id="filmService"></dd></div>
+    </dl>
+    <button id="close" autofocus>Close</button>
+  </div>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="calendar-data.js"></script>
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>
