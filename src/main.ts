@@ -119,12 +119,12 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
   }
   const firstTime = !opened.has(n);
   li.classList.add("open");
-  // light up only the door that was just opened
-  grid.querySelectorAll(".cell.lit").forEach((c) => c.classList.remove("lit"));
-  li.classList.add("lit");
   opened.add(n);
   save();
   if (firstTime) {
+    // light up only the door that was just opened; re-viewing an open door leaves the lights where they are
+    grid.querySelectorAll(".cell.lit").forEach((c) => c.classList.remove("lit"));
+    li.classList.add("lit");
     const r = li.getBoundingClientRect();
     sparkle(r.left + r.width / 2, r.top + r.height / 2);
   }
