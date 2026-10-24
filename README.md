@@ -8,7 +8,8 @@ It is a static site with no backend, so it can be hosted on GitHub Pages.
 
 ## How it works
 
-- Door *n* unlocks in December on or after day *n*, based on the visitor's device clock. Opened doors are remembered in the browser's `localStorage`.
+- Door *n* unlocks in December on or after day *n*, based on the visitor's device clock. Opened doors are remembered in the browser's `localStorage`, separately for each year.
+- The calendar stays open after Christmas, with every door unlocked, until 6 January, so people can come back and look through it. From 7 January it starts again: last year's doors are forgotten and every door is locked until December.
 - The doors appear in a fixed shuffled order, the same for everyone.
 - Film details are stored encrypted (AES-256-GCM) in `calendar-data.js` and decrypted in the browser with the Web Crypto API when a door is opened.
 - The page has snow and a sparkle effect when a door opens, and respects `prefers-reduced-motion` (the snow becomes slower and sparser, and the sparkle is skipped).
@@ -49,14 +50,14 @@ Doors need a secure context to decrypt, so use `localhost` or HTTPS (GitHub Page
 
 ## Testing URL options
 
-Outside December only (they are ignored during December):
+Outside the season only (they are ignored from 1 December to 6 January):
 
 - `?preview` unlocks every door.
 - `?date=2026-12-05` pretends it is that date.
 
 Either one puts the page in test mode. It asks for the curator's passphrase: with it, the doors show the real films; without it, they show made-up test films (not real titles, years or ratings), so testing never gives the list away. Doors opened in test mode are remembered separately from real ones.
 
-`?reset` clears the opened doors and works at any time.
+`?reset` clears the opened doors (for every year, and in test mode) and works at any time.
 
 ## Publishing
 

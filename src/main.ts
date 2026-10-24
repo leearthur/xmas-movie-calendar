@@ -7,10 +7,16 @@ declare global { interface Window { CALENDAR: CalendarData } }
 const DATA: CalendarData = window.CALENDAR;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* ---------- The calendar's season: 1 December to 6 January, so people can come back after Christmas ---------- */
+const SEASON_END = 7; // the calendar starts again on 7 January (the day after Twelfth Night)
+const inSeason = (d: Date): boolean => d.getMonth() === 11 || (d.getMonth() === 0 && d.getDate() < SEASON_END);
+// The year the calendar belongs to: the January days at the end of a season still belong to the year before
+const seasonYear = (d: Date): number => d.getFullYear() - (d.getMonth() === 0 && d.getDate() < SEASON_END ? 1 : 0);
+
 /* ---------- URL options (see "Testing URL options" in the README) ---------- */
 const params = new URLSearchParams(location.search);
 const realNow = new Date();
-const LIVE = realNow.getMonth() === 11; // in December the test overrides (?preview, ?date) are ignored
+const LIVE = inSeason(realNow); // during the season the test overrides (?preview, ?date) are ignored
 const PREVIEW = !LIVE && params.has("preview"); // ?preview unlocks every door
 
 // ?date=2026-12-05 pretends it's that day
@@ -20,24 +26,27 @@ const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
 
 // Test mode shows made-up films unless the curator's passphrase is given, and remembers its opened doors separately
 const TESTING = PREVIEW || parsed !== null;
-const LIVE_STORE = "advent-opened";
-const TEST_STORE = "advent-opened-test";
-const STORE = TESTING ? TEST_STORE : LIVE_STORE;
+// Opened doors are remembered per year, so last year's don't show as open this year
+const STORE_PREFIX = "advent-opened";
+const STORE = `${STORE_PREFIX}${TESTING ? "-test" : ""}-${seasonYear(now)}`; // test mode keeps its own doors, also per year
 let showRealFilms = !TESTING; // set only in memory once the passphrase is given, so a reload asks again
 
 // Not real films, years or ratings (IMDb ratings start at 1), so testing can never give the game away
 const testFilm = (n: number): Film => ({ title: `Test film ${n}`, year: "0000", rating: "0.0", service: "Nowhere (test mode)" });
 
-// ?reset closes every door again, in both normal and test mode (works on any device, no need to clear browser data)
+// ?reset closes every door again, for every year and in test mode (works on any device, no need to clear browser data)
 if (params.has("reset")) {
-  try { localStorage.removeItem(LIVE_STORE); localStorage.removeItem(TEST_STORE); } catch { /* ignore */ }
+  try {
+    Object.keys(localStorage).filter((k) => k.startsWith(STORE_PREFIX)).forEach((k) => localStorage.removeItem(k));
+  } catch { /* ignore */ }
   params.delete("reset");
   const rest = params.toString();
   history.replaceState(null, "", location.pathname + (rest ? `?${rest}` : "") + location.hash);
 }
 
-// Door n is unlocked in December on or after day n
-const isUnlocked = (n: number): boolean => PREVIEW || (now.getMonth() === 11 && now.getDate() >= n);
+// Door n is unlocked in December on or after day n, and every door stays unlocked until the season ends
+const isUnlocked = (n: number): boolean =>
+  PREVIEW || (inSeason(now) && (now.getMonth() === 0 || now.getDate() >= n));
 
 /* ---------- Remembered doors (storage can fail in private mode, so guard it) ---------- */
 let opened = new Set<number>();
@@ -73,8 +82,8 @@ const filmFor = (n: number): Promise<Film> =>
   showRealFilms ? decryptFilm(DATA.messages[n - 1], DATA.doorKey, n) : Promise.resolve(testFilm(n));
 
 // Show the calendar's year (follows ?date when testing)
-el("calYear").textContent = String(now.getFullYear());
-document.title += ` ${now.getFullYear()}`;
+el("calYear").textContent = String(seasonYear(now));
+document.title += ` ${seasonYear(now)}`;
 
 const grid = el<HTMLOListElement>("grid");
 const dlg = el<HTMLDialogElement>("dlg");
