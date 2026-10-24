@@ -53,36 +53,40 @@ header p{margin:0;opacity:.85;line-height:1.5}
   /* the lit cinema screen revealed behind an open door */
   background:radial-gradient(circle,#4a1a24 0%,#1b0a10 80%);box-shadow:inset 0 0 14px rgba(0,0,0,.6),inset 0 0 0 2px rgba(230,184,80,.5);
 }
-/* each door is a clapperboard: striped clapper arm across the top of a coloured slate */
+/* each door is a coloured gift box tied with a gold ribbon */
 .door{
   position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;border-radius:.5rem;
   color:#fff;font:700 clamp(1.3rem,5vw,1.9rem)/1 var(--serif);text-shadow:0 1px 3px rgba(0,0,0,.7);
   background:var(--c);transform-origin:left center;transition:transform 2.0s cubic-bezier(.3,.7,.2,1);
-  box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.16);
+  /* glow in the door's own colour */
+  box-shadow:0 0 14px 1px color-mix(in srgb,var(--c) 65%,transparent),0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.16);
   -webkit-tap-highlight-color:transparent;
 }
 .door::before{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  /* gold gift ribbon crossing behind the number */
   background:
-    /* chalk lines on the slate */
-    linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)) center 70%/70% 2px no-repeat,
-    linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)) center 84%/70% 2px no-repeat,
-    /* shadow where the clapper arm meets the slate */
-    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)) 0 17%/100% 3px no-repeat,
-    /* clapper arm: black bar with thin cream diagonal stripes */
-    repeating-linear-gradient(-60deg,#15151a 0 15px,#ece4d0 15px 20px) top/100% 17% no-repeat;
+    linear-gradient(90deg,#b97d1c,#f7dc86 50%,#b97d1c) 50% 0/15% 100% no-repeat,
+    linear-gradient(#b97d1c,#f7dc86 50%,#b97d1c) 0 50%/100% 15% no-repeat;
 }
 .door::after{
   content:attr(data-n);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  min-width:2.1em;height:2.1em;padding:0 .3em;display:grid;place-items:center;border-radius:1.1em;
-  background:rgba(12,18,38,.82);box-shadow:0 0 0 2px rgba(255,226,140,.8);font-size:.62em;text-shadow:none;
+  box-sizing:border-box;min-width:2.1em;height:2.1em;padding:0 .3em;display:grid;place-items:center;border-radius:50%;
+  /* a deep red bauble with a gold rim, so the gold number stands out on every door colour */
+  background:radial-gradient(circle at 35% 28%,#c23a4a,#7d1a2b 55%,#3f0b16);
+  color:#ffe28a;font-size:1.1em;text-shadow:0 0 6px rgba(255,214,102,.7),0 1px 2px rgba(0,0,0,.8);
+  box-shadow:0 0 0 3px #f4cf5c,0 0 0 4.5px #b9801f,0 3px 7px rgba(0,0,0,.6);
 }
 .door:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
-.cell:nth-child(4n+1) .door{--c:var(--red)}
-.cell:nth-child(4n+2) .door{--c:var(--pine)}
-.cell:nth-child(4n+3) .door{--c:var(--berry)}
-.cell:nth-child(4n) .door{--c:#2a6f5c}
-.cell:nth-child(8n+3) .door{--c:var(--gold)}
+.door:hover,.door:focus-visible{box-shadow:0 0 22px 4px color-mix(in srgb,var(--c) 85%,transparent),0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.16)}
+/* an open door swings away, so it stops glowing */
+.cell.open .door{box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.16)}
+/* vivid door colours, repeating every five doors (five avoids lining up in columns) */
+.cell:nth-child(5n+1) .door{--c:#d9283a}
+.cell:nth-child(5n+2) .door{--c:#1f9d57}
+.cell:nth-child(5n+3) .door{--c:#1f6fe0}
+.cell:nth-child(5n+4) .door{--c:#e8a113}
+.cell:nth-child(5n) .door{--c:#c2287a}
 /* the door number glows on the screen behind the door */
 .inside::before{
   content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;
