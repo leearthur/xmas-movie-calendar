@@ -83,7 +83,6 @@ header p{margin:0;opacity:.85;line-height:1.5}
 .cell:nth-child(4n+3) .door{--c:var(--berry)}
 .cell:nth-child(4n) .door{--c:#2a6f5c}
 .cell:nth-child(8n+3) .door{--c:var(--gold)}
-.cell.locked .door{filter:saturate(.45) brightness(.7)}
 /* the door number glows on the screen behind the door */
 .inside::before{
   content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;
