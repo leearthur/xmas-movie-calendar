@@ -10,8 +10,9 @@ It is a static site with no backend, so it can be hosted on GitHub Pages.
 
 - Door *n* unlocks in December on or after day *n*, based on the visitor's device clock. Opened doors are remembered in the browser's `localStorage`, separately for each year.
 - The calendar stays open after Christmas, with every door unlocked, until 6 January, so people can come back and look through it. From 7 January it starts again: last year's doors are forgotten and every door is locked until December.
-- The doors appear in a fixed shuffled order, the same for everyone.
+- The doors appear in a shuffled order, the same for everyone during a year, and different from one year to the next.
 - Film details are stored encrypted (AES-256-GCM) in `calendar-data.js` and decrypted in the browser with the Web Crypto API when a door is opened.
+- Everything works with a keyboard and a screen reader: each door says whether it is locked, ready or opened, a door opening is announced, and the film's details are read out when its dialog opens.
 - The page has snow and a sparkle effect when a door opens, and respects `prefers-reduced-motion` (the snow becomes slower and sparser, and the sparkle is skipped).
 
 The key that opens the doors is shipped in `calendar-data.js` alongside the encrypted data. This keeps the films from being stumbled on, by you or anyone browsing the repo, but it is not real protection against someone determined to read them.

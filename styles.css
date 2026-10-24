@@ -114,6 +114,9 @@ header p{margin:0;opacity:.85;line-height:1.5}
 @keyframes bulb{0%{opacity:.25;transform:scale(.99)}60%{opacity:1}100%{opacity:.7;transform:scale(1.01)}}
 @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
+/* hidden from view, but still read out by screen readers */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
 .fx{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;transform:translateZ(0)}
 .fx-snow{z-index:0}
 .fx-sparkle{z-index:2}

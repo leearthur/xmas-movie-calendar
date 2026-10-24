@@ -61,7 +61,7 @@ function el<T extends HTMLElement>(id: string): T {
   return e as T;
 }
 
-// Same shuffled order for everyone, every visit
+// Same shuffled order for everyone, every visit during a year; a new order each year
 function seeded(seed: number): () => number {
   let s = seed | 0;
   return () => {
@@ -72,7 +72,7 @@ function seeded(seed: number): () => number {
   };
 }
 const order: number[] = Array.from({ length: 24 }, (_, i) => i + 1);
-const rnd = seeded(2024);
+const rnd = seeded(seasonYear(now));
 for (let i = order.length - 1; i > 0; i--) {
   const j = Math.floor(rnd() * (i + 1));
   [order[i], order[j]] = [order[j], order[i]];
@@ -88,6 +88,7 @@ document.title += ` ${seasonYear(now)}`;
 const grid = el<HTMLOListElement>("grid");
 const dlg = el<HTMLDialogElement>("dlg");
 const toast = el<HTMLDivElement>("toast");
+const announcer = el<HTMLDivElement>("announce");
 let toastTimer: number | undefined;
 
 function say(text: string): void {
@@ -95,6 +96,18 @@ function say(text: string): void {
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+// Screen reader only: said aloud but not shown, for things the picture already shows (like a door opening)
+function announce(text: string): void {
+  announcer.textContent = "";
+  window.setTimeout(() => { announcer.textContent = text; }, 50); // clearing first makes repeated messages get read again
+}
+
+// What a screen reader says for a door: its number and whether it can be opened
+function doorLabel(n: number): string {
+  if (opened.has(n)) return `Door ${n}, opened. Press to see the film again.`;
+  return isUnlocked(n) ? `Door ${n}, ready to open.` : `Door ${n}, locked until ${n} December.`;
 }
 
 for (const n of order) {
@@ -105,7 +118,7 @@ for (const n of order) {
   b.className = "door";
   b.type = "button";
   b.dataset.n = String(n);
-  b.setAttribute("aria-label", `Door ${n}`);
+  b.setAttribute("aria-label", doorLabel(n));
   // Listen on the cell so clicks on the revealed area behind an open door work too (the button's click bubbles up)
   li.addEventListener("click", () => void openDoor(n, li));
   li.appendChild(b);
@@ -133,7 +146,9 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
   li.classList.add("open");
   opened.add(n);
   save();
+  li.querySelector("button")?.setAttribute("aria-label", doorLabel(n));
   if (firstTime) {
+    announce(`Door ${n} opened.`);
     // light up only the door that was just opened; re-viewing an open door leaves the lights where they are
     grid.querySelectorAll(".cell.lit").forEach((c) => c.classList.remove("lit"));
     li.classList.add("lit");
@@ -144,8 +159,15 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
     el("dlgDay").textContent = `${n} December`;
     el("filmTitle").textContent = film.title;
     el("filmYear").textContent = film.year;
-    el("filmRating").textContent = `★ ${film.rating}`;
+    // the star is decoration; a screen reader would read it as "black star"
+    const star = document.createElement("span");
+    star.setAttribute("aria-hidden", "true");
+    star.textContent = "★ ";
+    el("filmRating").replaceChildren(star, film.rating);
     el("filmService").textContent = film.service;
+    // read out when the dialog opens, since a screen reader may announce only its title
+    el("dlgSummary").textContent =
+      `${n} December. ${film.title}, ${film.year}. IMDb rating ${film.rating}. Watch on ${film.service}.`;
     dlg.showModal();
   };
   if (reduceMotion || !firstTime) show();

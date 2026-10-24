@@ -15,11 +15,14 @@
     <p>Open tonight's door to find out what we're watching.</p>
   </div>
 </header>
+<main>
 <ol id="grid"></ol>
+</main>
 
-<dialog id="dlg" aria-labelledby="filmTitle">
+<dialog id="dlg" aria-labelledby="filmTitle" aria-describedby="dlgSummary">
   <div class="stripe">Admit one · Christmas film night</div>
   <div class="card">
+    <p class="sr-only" id="dlgSummary"></p>
     <div class="day" id="dlgDay"></div>
     <h2 id="filmTitle"></h2>
     <p class="year" id="filmYear"></p>
@@ -45,6 +48,7 @@
   </form>
 </dialog>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="announce" class="sr-only" role="status" aria-live="polite"></div>
 
 <script src="calendar-data.js"></script>
 <script type="module" src="dist/main.js"></script>
