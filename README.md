@@ -38,7 +38,7 @@ PASSPHRASE="your-passphrase" npm run encrypt    # PowerShell: $env:PASSPHRASE = 
 ### Build and run locally
 
 ```sh
-npm run build    # compile src/ to dist/ (or `npm run watch`)
+npm run build    # compile src/ to dist/ and type-check encrypt.ts (or `npm run watch` for src/ only)
 npm run serve    # serve the site locally
 ```
 
@@ -55,4 +55,6 @@ Outside December only (they are ignored during December):
 
 ## Publishing
 
-Commit `dist/` and `calendar-data.js`, push to GitHub, and enable GitHub Pages for the branch. Run `npm run build` before committing so `dist/` is current.
+Pushing to `main` runs the `.github/workflows/deploy.yml` workflow, which builds the site and publishes it to GitHub Pages. In the repository settings, Pages → Source must be set to **GitHub Actions**.
+
+`dist/` is built by the workflow and is not committed. `calendar-data.js` is committed, because building it needs `messages.txt` and the passphrase, so rerun `npm run encrypt` and commit the result whenever the films change.

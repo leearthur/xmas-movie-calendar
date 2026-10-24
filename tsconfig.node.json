@@ -1,0 +1,13 @@
+// Type-checks the Node scripts (run with tsx, so nothing is emitted)
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["encrypt.ts"]
+}

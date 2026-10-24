@@ -2,7 +2,7 @@
   "name": "advent-calendar",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.node.json",
     "watch": "tsc --watch",
     "encrypt": "tsx encrypt.ts",
     "serve": "npx serve ."

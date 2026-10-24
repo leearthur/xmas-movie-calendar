@@ -1,45 +1,46 @@
 import { startSnow, sparkle } from "./effects.js";
+import type { CalendarData, Film } from "./types.js";
 
-interface Film { title: string; year: string; rating: string; service: string }
-interface CalendarData { passphrase: string; messages: string[] }
 declare global { interface Window { CALENDAR: CalendarData } }
 
 const DATA: CalendarData = window.CALENDAR;
+const STORE = "advent-opened";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- URL options (see "Testing URL options" in the README) ---------- */
 const params = new URLSearchParams(location.search);
 const realNow = new Date();
 const LIVE = realNow.getMonth() === 11; // in December the test overrides (?preview, ?date) are ignored
-const PREVIEW = !LIVE && params.has("preview"); // add ?preview to unlock every door
-const STORE = "advent-opened";
+const PREVIEW = !LIVE && params.has("preview"); // ?preview unlocks every door
 
-// Add ?reset to the URL to close every door again (works on any device, no need to clear browser data)
+// ?date=2026-12-05 pretends it's that day
+const dateParam = LIVE ? null : params.get("date");
+const parsed = dateParam ? new Date(`${dateParam}T12:00:00`) : null;
+const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
+
+// ?reset closes every door again (works on any device, no need to clear browser data)
 if (params.has("reset")) {
   try { localStorage.removeItem(STORE); } catch { /* ignore */ }
   params.delete("reset");
   const rest = params.toString();
   history.replaceState(null, "", location.pathname + (rest ? `?${rest}` : "") + location.hash);
 }
-const enc = new TextEncoder();
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function el<T extends HTMLElement>(id: string): T {
-  const e = document.getElementById(id);
-  if (!e) throw new Error(`Missing #${id}`);
-  return e as T;
-}
+// Door n is unlocked in December on or after day n
+const isUnlocked = (n: number): boolean => PREVIEW || (now.getMonth() === 11 && now.getDate() >= n);
 
-// Remembered doors (storage can fail in private mode, so guard it)
+/* ---------- Remembered doors (storage can fail in private mode, so guard it) ---------- */
 let opened = new Set<number>();
 try { opened = new Set<number>(JSON.parse(localStorage.getItem(STORE) ?? "[]")); } catch { /* ignore */ }
 const save = (): void => {
   try { localStorage.setItem(STORE, JSON.stringify([...opened])); } catch { /* ignore */ }
 };
 
-// Door n is unlocked in December on or after day n
-// Test helper: add ?date=2026-12-05 to the URL to pretend it's that day
-const dateParam = LIVE ? null : params.get("date");
-const parsed = dateParam ? new Date(`${dateParam}T12:00:00`) : null;
-const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
-const isUnlocked = (n: number): boolean => PREVIEW || (now.getMonth() === 11 && now.getDate() >= n);
+function el<T extends HTMLElement>(id: string): T {
+  const e = document.getElementById(id);
+  if (!e) throw new Error(`Missing #${id}`);
+  return e as T;
+}
 
 // Same shuffled order for everyone, every visit
 function seeded(seed: number): () => number {
@@ -58,12 +59,13 @@ for (let i = order.length - 1; i > 0; i--) {
   [order[i], order[j]] = [order[j], order[i]];
 }
 
-// Decrypt one message (AES-GCM, key from passphrase + door number)
+// Decrypt one message: the reverse of encrypt() in encrypt.ts (AES-GCM, key from passphrase + door number)
 async function decrypt(n: number): Promise<Film> {
+  const encoder = new TextEncoder();
   const raw = Uint8Array.from(atob(DATA.messages[n - 1]), (c) => c.charCodeAt(0));
-  const base = await crypto.subtle.importKey("raw", enc.encode(DATA.passphrase), "PBKDF2", false, ["deriveKey"]);
+  const base = await crypto.subtle.importKey("raw", encoder.encode(DATA.passphrase), "PBKDF2", false, ["deriveKey"]);
   const key = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: enc.encode(`door-${n}`), iterations: 100000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: encoder.encode(`door-${n}`), iterations: 100000, hash: "SHA-256" },
     base,
     { name: "AES-GCM", length: 256 },
     false,
