@@ -19,10 +19,25 @@ const realNow = new Date();
 const LIVE = inSeason(realNow); // during the season the test overrides (?preview, ?date) are ignored
 const PREVIEW = !LIVE && params.has("preview"); // ?preview unlocks every door
 
-// ?date=2026-12-05 pretends it's that day
-const dateParam = LIVE ? null : params.get("date");
-const parsed = dateParam ? new Date(`${dateParam}T12:00:00`) : null;
-const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
+// ?date=2026-12-05 pretends it's that day; anything that isn't a real date of that shape is ignored
+function parseDate(text: string | null): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text ?? "");
+  if (!m) return null;
+  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(year, month - 1, day, 12);
+  return date.getMonth() === month - 1 && date.getDate() === day ? date : null; // rejects 2026-02-30 and the like
+}
+const parsed = LIVE ? null : parseDate(params.get("date"));
+const now = parsed ?? realNow;
+
+// Take an option out of the address bar without reloading the page
+function removeParam(name: string): void {
+  params.delete(name);
+  const rest = params.toString().replace(/=(&|$)/g, "$1"); // keep options like ?preview looking as typed
+  history.replaceState(null, "", location.pathname + (rest ? `?${rest}` : "") + location.hash);
+}
+// A ?date that was ignored is dropped from the address, which shows it wasn't accepted
+if (params.has("date") && parsed === null) removeParam("date");
 
 // Test mode shows made-up films unless the curator's passphrase is given, and remembers its opened doors separately
 const TESTING = PREVIEW || parsed !== null;
@@ -39,9 +54,7 @@ if (params.has("reset")) {
   try {
     Object.keys(localStorage).filter((k) => k.startsWith(STORE_PREFIX)).forEach((k) => localStorage.removeItem(k));
   } catch { /* ignore */ }
-  params.delete("reset");
-  const rest = params.toString();
-  history.replaceState(null, "", location.pathname + (rest ? `?${rest}` : "") + location.hash);
+  removeParam("reset");
 }
 
 // Door n is unlocked in December on or after day n, and every door stays unlocked until the season ends
