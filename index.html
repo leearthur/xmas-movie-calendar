@@ -30,6 +30,20 @@
     <button id="close" autofocus>Close</button>
   </div>
 </dialog>
+<!-- shown in test mode (?preview or ?date) -->
+<dialog id="unlockDlg" aria-labelledby="unlockTitle">
+  <div class="stripe">Test mode</div>
+  <form class="card unlock" id="unlockForm">
+    <h2 id="unlockTitle">Who's testing?</h2>
+    <p>Enter the curator's passphrase to see the real films, or carry on with made-up test films.</p>
+    <input type="password" id="unlockPass" autocomplete="off" aria-label="Curator's passphrase" placeholder="Curator's passphrase">
+    <p class="unlock-error" id="unlockError" role="alert" hidden>That passphrase isn't right.</p>
+    <div class="buttons">
+      <button type="button" class="secondary" id="useTestFilms">Use test films</button>
+      <button type="submit">Unlock</button>
+    </div>
+  </form>
+</dialog>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script src="calendar-data.js"></script>

@@ -1,10 +1,10 @@
+import { decryptFilm, hashPassphrase } from "./crypto.js";
 import { startSnow, sparkle } from "./effects.js";
 import type { CalendarData, Film } from "./types.js";
 
 declare global { interface Window { CALENDAR: CalendarData } }
 
 const DATA: CalendarData = window.CALENDAR;
-const STORE = "advent-opened";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------- URL options (see "Testing URL options" in the README) ---------- */
@@ -17,6 +17,16 @@ const PREVIEW = !LIVE && params.has("preview"); // ?preview unlocks every door
 const dateParam = LIVE ? null : params.get("date");
 const parsed = dateParam ? new Date(`${dateParam}T12:00:00`) : null;
 const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
+
+// Test mode shows made-up films unless the curator's passphrase is given, and remembers its opened doors separately
+const TESTING = PREVIEW || parsed !== null;
+const STORE = TESTING ? "advent-opened-test" : "advent-opened";
+const UNLOCKED = "advent-test-unlocked"; // sessionStorage flag: the passphrase was given in this tab
+let showRealFilms = !TESTING;
+try { if (TESTING && sessionStorage.getItem(UNLOCKED)) showRealFilms = true; } catch { /* ignore */ }
+
+// Not real films, years or ratings (IMDb ratings start at 1), so testing can never give the game away
+const testFilm = (n: number): Film => ({ title: `Test film ${n}`, year: "0000", rating: "0.0", service: "Nowhere (test mode)" });
 
 // ?reset closes every door again (works on any device, no need to clear browser data)
 if (params.has("reset")) {
@@ -59,21 +69,8 @@ for (let i = order.length - 1; i > 0; i--) {
   [order[i], order[j]] = [order[j], order[i]];
 }
 
-// Decrypt one message: the reverse of encrypt() in encrypt.ts (AES-GCM, key from passphrase + door number)
-async function decrypt(n: number): Promise<Film> {
-  const encoder = new TextEncoder();
-  const raw = Uint8Array.from(atob(DATA.messages[n - 1]), (c) => c.charCodeAt(0));
-  const base = await crypto.subtle.importKey("raw", encoder.encode(DATA.passphrase), "PBKDF2", false, ["deriveKey"]);
-  const key = await crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: encoder.encode(`door-${n}`), iterations: 100000, hash: "SHA-256" },
-    base,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["decrypt"]
-  );
-  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: raw.slice(0, 12) }, key, raw.slice(12));
-  return JSON.parse(new TextDecoder().decode(plain)) as Film;
-}
+const filmFor = (n: number): Promise<Film> =>
+  showRealFilms ? decryptFilm(DATA.messages[n - 1], DATA.doorKey, n) : Promise.resolve(testFilm(n));
 
 // Show the calendar's year (follows ?date when testing)
 el("calYear").textContent = String(now.getFullYear());
@@ -116,10 +113,10 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
   }
   let film: Film;
   try {
-    film = await decrypt(n);
+    film = await filmFor(n);
   } catch {
     say(window.isSecureContext
-      ? "Couldn't open that door. Check the passphrase in calendar-data.js."
+      ? "Couldn't open that door. calendar-data.js may be damaged; try saving the films again."
       : "This page needs HTTPS (or localhost) to open doors.");
     return;
   }
@@ -148,5 +145,26 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
 
 el("close").addEventListener("click", () => dlg.close());
 dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); }); // tap outside to close
+
+/* ---------- Test mode: ask for the curator's passphrase ---------- */
+const unlockDlg = el<HTMLDialogElement>("unlockDlg");
+const unlockPass = el<HTMLInputElement>("unlockPass");
+const unlockError = el<HTMLParagraphElement>("unlockError");
+
+el<HTMLFormElement>("unlockForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const ok = (await hashPassphrase(unlockPass.value, DATA.passphraseSalt)) === DATA.passphraseHash;
+  unlockPass.value = "";
+  if (!ok) { unlockError.hidden = false; unlockPass.focus(); return; }
+  showRealFilms = true;
+  try { sessionStorage.setItem(UNLOCKED, "1"); } catch { /* ignore */ }
+  unlockDlg.close();
+  say("Test mode: showing the real films.");
+});
+el("useTestFilms").addEventListener("click", () => {
+  unlockDlg.close();
+  say("Test mode: showing made-up test films.");
+});
+if (TESTING && !showRealFilms) unlockDlg.showModal();
 
 startSnow();

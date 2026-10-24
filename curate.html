@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film Curator</title>
+<!-- Served by curate.ts (npm run curate); not part of the published site -->
+<style>
+  :root{--night:#12203a;--snow:#f6f2ea;--brass:#e6b850;--red:#b3202f;--pine:#1f6b45;--ink:#2a2118;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+  body{margin:0;padding:1.5rem 1rem 3rem;background:var(--night);color:var(--snow);font-family:var(--serif)}
+  main{max-width:52rem;margin:0 auto}
+  h1{color:var(--brass);font-style:italic;margin:0 0 .3rem}
+  section{background:var(--snow);color:var(--ink);border-radius:.8rem;padding:1.2rem 1.4rem;margin-top:1.2rem}
+  h2{margin:0 0 .6rem;color:var(--red);font-size:1.3rem}
+  p{line-height:1.45;margin:.4rem 0}
+  input{box-sizing:border-box;font:inherit;font-size:.95rem;padding:.5rem .6rem;border:1px solid #cdbfa5;border-radius:.4rem;background:#fff;color:var(--ink);width:100%}
+  button{font:inherit;font-size:1rem;padding:.6rem 1.4rem;border:0;border-radius:2rem;background:var(--pine);color:var(--snow);cursor:pointer}
+  button.secondary{background:transparent;color:var(--pine);box-shadow:inset 0 0 0 2px var(--pine)}
+  button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+  .row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.8rem}
+  .row input{flex:1 1 14rem;width:auto}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}
+  /* the film name takes whatever width is left over */
+  th:nth-child(1){width:4.2rem}
+  th:nth-child(3){width:5rem}
+  th:nth-child(4){width:6.5rem}
+  th:nth-child(5){width:11rem}
+  th{text-align:left;font-size:.85rem;padding:.3rem .3rem;opacity:.7}
+  td{padding:.25rem .3rem}
+  td:first-child{white-space:nowrap;font-weight:700;color:var(--pine)}
+  .msg{font-weight:600}
+  .msg.error{color:var(--red)}
+  .msg.ok{color:var(--pine)}
+  [hidden]{display:none!important}
+  @media (max-width:640px){
+    thead{display:none}
+    tr{display:grid;grid-template-columns:1fr 1fr;gap:.3rem;padding:.6rem 0;border-bottom:1px solid #e3d8c3}
+    td:first-child,td:nth-child(2){grid-column:1/-1}
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Christmas Film Advent Calendar: film curator</h1>
+  <p>Fill in this year's 24 films and save them. They are encrypted before they're saved, and nothing is kept in plain text.</p>
+
+  <section id="existing" hidden>
+    <h2>There is already a list</h2>
+    <p>To change it, enter the passphrase it was saved with.</p>
+    <form class="row" id="unlockForm" autocomplete="off">
+      <input type="password" id="unlockPass" autocomplete="off" placeholder="Passphrase" aria-label="Passphrase">
+      <button type="submit">Unlock and edit</button>
+    </form>
+    <p>Or <button type="button" class="secondary" id="startNew">start a new list</button> (the current list is replaced when you save).</p>
+    <p class="msg error" id="unlockMsg" role="alert"></p>
+  </section>
+
+  <form id="filmsForm" autocomplete="off" hidden>
+    <section>
+      <h2>The films</h2>
+      <p>One film per door, door 1 is 1 December.</p>
+      <table>
+        <thead><tr><th>Door</th><th>Film name</th><th>Year</th><th>IMDb rating</th><th>Streaming service</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Passphrase</h2>
+      <p>Choose a passphrase (at least 6 characters) and keep it to yourself. You'll need it to test the calendar with the real films (<code>?preview</code>) and to edit the list later. It is not stored anywhere, so don't forget it.</p>
+      <div class="row">
+        <input type="password" id="pass" autocomplete="new-password" placeholder="Passphrase" aria-label="Passphrase">
+        <input type="password" id="pass2" autocomplete="new-password" placeholder="Passphrase again" aria-label="Passphrase again">
+      </div>
+      <div class="row">
+        <button type="submit">Save the films</button>
+        <span class="msg" id="saveMsg" role="status"></span>
+      </div>
+    </section>
+  </form>
+
+  <section id="done" hidden>
+    <h2>Saved</h2>
+    <p>The films are saved in <code>calendar-data.js</code>. Commit and push it to publish them, then you can close this page and stop the server (Ctrl+C).</p>
+  </section>
+</main>
+
+<script type="module">
+  const $ = (id) => document.getElementById(id);
+  const FIELDS = ["title", "year", "rating", "service"];
+  const LABELS = { title: "Film name", year: "Year", rating: "IMDb rating", service: "Streaming service" };
+
+  // 24 rows of empty inputs
+  for (let n = 1; n <= 24; n++) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${n} Dec</td>` + FIELDS.map((f) =>
+      `<td><input data-door="${n}" data-field="${f}" autocomplete="off" aria-label="Door ${n} ${LABELS[f]}" placeholder="${LABELS[f]}"></td>`).join("");
+    $("rows").appendChild(tr);
+  }
+  const input = (n, f) => document.querySelector(`input[data-door="${n}"][data-field="${f}"]`);
+
+  async function post(url, body) {
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    return { ok: res.ok, data: await res.json() };
+  }
+
+  const showFilms = () => { $("existing").hidden = true; $("filmsForm").hidden = false; input(1, "title").focus(); };
+
+  const { exists } = await (await fetch("/api/status")).json();
+  if (exists) $("existing").hidden = false;
+  else showFilms();
+
+  $("startNew").addEventListener("click", showFilms);
+
+  $("unlockForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const passphrase = $("unlockPass").value;
+    const { ok, data } = await post("/api/unlock", { passphrase });
+    if (!ok) { $("unlockMsg").textContent = data.error; return; }
+    data.films.forEach((film, i) => FIELDS.forEach((f) => { input(i + 1, f).value = film[f]; }));
+    $("pass").value = $("pass2").value = passphrase; // keep the same passphrase unless it's changed
+    $("unlockPass").value = "";
+    showFilms();
+  });
+
+  $("filmsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("saveMsg");
+    msg.className = "msg error";
+    if ($("pass").value !== $("pass2").value) { msg.textContent = "The two passphrases don't match."; return; }
+    const films = Array.from({ length: 24 }, (_, i) =>
+      Object.fromEntries(FIELDS.map((f) => [f, input(i + 1, f).value.trim()])));
+    msg.className = "msg";
+    msg.textContent = "Saving…";
+    const { ok, data } = await post("/api/save", { passphrase: $("pass").value, films });
+    if (!ok) { msg.className = "msg error"; msg.textContent = data.error; return; }
+    // clear everything off the page once saved
+    $("filmsForm").reset();
+    $("filmsForm").hidden = true;
+    $("done").hidden = false;
+  });
+</script>
+</body>
+</html>

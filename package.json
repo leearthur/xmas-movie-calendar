@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc && tsc -p tsconfig.node.json",
     "watch": "tsc --watch",
-    "encrypt": "tsx encrypt.ts",
+    "curate": "tsx curate.ts",
     "serve": "serve ."
   },
   "devDependencies": {
