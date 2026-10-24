@@ -1,14 +1,16 @@
 {
   "name": "advent-calendar",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc && tsc -p tsconfig.node.json",
     "watch": "tsc --watch",
     "encrypt": "tsx encrypt.ts",
-    "serve": "npx serve ."
+    "serve": "serve ."
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "serve": "^14.2.6",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
   }

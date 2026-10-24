@@ -75,6 +75,10 @@ async function decrypt(n: number): Promise<Film> {
   return JSON.parse(new TextDecoder().decode(plain)) as Film;
 }
 
+// Show the calendar's year (follows ?date when testing)
+el("calYear").textContent = String(now.getFullYear());
+document.title += ` ${now.getFullYear()}`;
+
 const grid = el<HTMLOListElement>("grid");
 const dlg = el<HTMLDialogElement>("dlg");
 const toast = el<HTMLDivElement>("toast");
@@ -139,7 +143,7 @@ async function openDoor(n: number, li: HTMLElement): Promise<void> {
     dlg.showModal();
   };
   if (reduceMotion || !firstTime) show();
-  else setTimeout(show, 1500);
+  else setTimeout(show, 1200);
 }
 
 el("close").addEventListener("click", () => dlg.close());

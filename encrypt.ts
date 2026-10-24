@@ -14,7 +14,7 @@ if (!PASSPHRASE) {
 }
 
 const lines: string[] = fs
-  .readFileSync(path.join(__dirname, "messages.txt"), "utf8")
+  .readFileSync(path.join(import.meta.dirname, "messages.txt"), "utf8")
   .split(/\r?\n/)
   .filter((l) => l.trim() && !l.trim().startsWith("#"));
 
@@ -48,5 +48,5 @@ const data: CalendarData = {
   messages: lines.map((line, i) => encrypt(parseFilm(line, i + 1), i + 1)),
 };
 
-fs.writeFileSync(path.join(__dirname, "calendar-data.js"), `window.CALENDAR = ${JSON.stringify(data, null, 1)};\n`);
+fs.writeFileSync(path.join(import.meta.dirname, "calendar-data.js"), `window.CALENDAR = ${JSON.stringify(data, null, 1)};\n`);
 console.log("Wrote calendar-data.js with 24 encrypted messages.");
