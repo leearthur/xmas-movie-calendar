@@ -20,17 +20,17 @@ const now = parsed && !isNaN(parsed.getTime()) ? parsed : realNow;
 
 // Test mode shows made-up films unless the curator's passphrase is given, and remembers its opened doors separately
 const TESTING = PREVIEW || parsed !== null;
-const STORE = TESTING ? "advent-opened-test" : "advent-opened";
-const UNLOCKED = "advent-test-unlocked"; // sessionStorage flag: the passphrase was given in this tab
-let showRealFilms = !TESTING;
-try { if (TESTING && sessionStorage.getItem(UNLOCKED)) showRealFilms = true; } catch { /* ignore */ }
+const LIVE_STORE = "advent-opened";
+const TEST_STORE = "advent-opened-test";
+const STORE = TESTING ? TEST_STORE : LIVE_STORE;
+let showRealFilms = !TESTING; // set only in memory once the passphrase is given, so a reload asks again
 
 // Not real films, years or ratings (IMDb ratings start at 1), so testing can never give the game away
 const testFilm = (n: number): Film => ({ title: `Test film ${n}`, year: "0000", rating: "0.0", service: "Nowhere (test mode)" });
 
-// ?reset closes every door again (works on any device, no need to clear browser data)
+// ?reset closes every door again, in both normal and test mode (works on any device, no need to clear browser data)
 if (params.has("reset")) {
-  try { localStorage.removeItem(STORE); } catch { /* ignore */ }
+  try { localStorage.removeItem(LIVE_STORE); localStorage.removeItem(TEST_STORE); } catch { /* ignore */ }
   params.delete("reset");
   const rest = params.toString();
   history.replaceState(null, "", location.pathname + (rest ? `?${rest}` : "") + location.hash);
@@ -157,7 +157,6 @@ el<HTMLFormElement>("unlockForm").addEventListener("submit", async (e) => {
   unlockPass.value = "";
   if (!ok) { unlockError.hidden = false; unlockPass.focus(); return; }
   showRealFilms = true;
-  try { sessionStorage.setItem(UNLOCKED, "1"); } catch { /* ignore */ }
   unlockDlg.close();
   say("Test mode: showing the real films.");
 });
@@ -165,6 +164,6 @@ el("useTestFilms").addEventListener("click", () => {
   unlockDlg.close();
   say("Test mode: showing made-up test films.");
 });
-if (TESTING && !showRealFilms) unlockDlg.showModal();
+if (TESTING) unlockDlg.showModal();
 
 startSnow();
