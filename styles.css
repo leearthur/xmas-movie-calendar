@@ -93,10 +93,14 @@ header p{margin:0;opacity:.85;line-height:1.5}
 .cell:nth-child(5n+3) .door{--c:#1f6fe0}
 .cell:nth-child(5n+4) .door{--c:#e8a113}
 .cell:nth-child(5n) .door{--c:#c2287a}
-/* the door number glows on the screen behind the door */
+/* a festive picture glows on the screen behind the door, with the door number small in the corner */
 .inside::before{
-  content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;
-  font:700 clamp(2.4rem,9vw,4.2rem)/1 var(--serif);color:rgba(255,226,140,.8);text-shadow:0 0 14px rgba(230,184,80,.6);
+  content:attr(data-n);position:absolute;top:.5rem;right:.7rem;
+  font:700 clamp(1rem,3.6vw,1.35rem)/1 var(--serif);color:rgba(255,226,140,.85);text-shadow:0 0 8px rgba(230,184,80,.6);
+}
+.inside::after{
+  content:attr(data-picture);font-size:clamp(2.6rem,10vw,4.2rem);line-height:1;padding-top:.5rem;
+  filter:drop-shadow(0 0 10px rgba(230,184,80,.55));
 }
 .inside{z-index:0}
 .cell.open .inside{cursor:pointer}

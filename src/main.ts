@@ -123,10 +123,16 @@ function doorLabel(n: number): string {
   return isUnlocked(n) ? `Door ${n}, ready to open.` : `Door ${n}, locked until ${n} December.`;
 }
 
+// A festive picture revealed behind each door (the doors are shuffled, but door n always has the same picture)
+const PICTURES = [
+  "⛄", "🧦", "🍪", "🔔", "🦌", "🎁", "❄️", "🕯️", "🍿", "🍬", "⭐", "🎶",
+  "🎬", "🍷", "🥧", "🛷", "🧤", "🍫", "🏠", "👼", "🎀", "🍊", "🎅", "🎄",
+];
+
 for (const n of order) {
   const li = document.createElement("li");
   li.className = "cell" + (isUnlocked(n) ? "" : " locked") + (opened.has(n) ? " open" : "");
-  li.innerHTML = `<div class="inside" data-n="${n}" aria-hidden="true"></div>`;
+  li.innerHTML = `<div class="inside" data-n="${n}" data-picture="${PICTURES[n - 1]}" aria-hidden="true"></div>`;
   const b = document.createElement("button");
   b.className = "door";
   b.type = "button";
@@ -197,12 +203,20 @@ const unlockError = el<HTMLParagraphElement>("unlockError");
 
 // The eye button shows what has been typed, which helps when mistyping on a phone
 const revealPass = el<HTMLButtonElement>("revealPass");
+// The button keeps one label and uses aria-pressed for its state. Focus goes back to the box so the phone keyboard
+// stays up, so the change is also said aloud from a live region inside the dialog (the rest of the page is inert while it is open)
+const revealStatus = el("revealStatus");
 function showPassphrase(show: boolean): void {
   unlockPass.type = show ? "text" : "password";
   revealPass.setAttribute("aria-pressed", String(show));
-  revealPass.setAttribute("aria-label", show ? "Hide passphrase" : "Show passphrase");
 }
-revealPass.addEventListener("click", () => { showPassphrase(unlockPass.type === "password"); unlockPass.focus(); });
+revealPass.addEventListener("click", () => {
+  const show = unlockPass.type === "password";
+  showPassphrase(show);
+  revealStatus.textContent = "";
+  window.setTimeout(() => { revealStatus.textContent = show ? "Passphrase shown" : "Passphrase hidden"; }, 50);
+  unlockPass.focus();
+});
 
 el<HTMLFormElement>("unlockForm").addEventListener("submit", async (e) => {
   e.preventDefault();
