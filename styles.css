@@ -21,7 +21,7 @@ header,#grid{position:relative;z-index:1}
 
 /* string of fairy lights */
 .lights{
-  height:34px;margin:0 -1rem 1rem;padding-top:env(safe-area-inset-top);box-sizing:content-box;
+  height:34px;margin:0 -1rem 1rem;box-sizing:content-box;
   background:
     radial-gradient(circle at 14px 20px,#ff5566 0 4px,rgba(255,85,102,.4) 5px,transparent 12px),
     radial-gradient(circle at 38px 20px,#ffd25e 0 4px,rgba(255,210,94,.4) 5px,transparent 12px),
@@ -37,7 +37,7 @@ header,#grid{position:relative;z-index:1}
 header{text-align:center;margin:0 auto 2.2rem;max-width:34rem}
 /* cinema marquee with a row of chasing bulbs top and bottom */
 .marquee{
-  position:relative;padding:1.8rem 1rem 1.5rem;border:3px solid var(--brass);border-radius:.6rem;
+  position:relative;padding:1.8rem 1rem;border:3px solid var(--brass);border-radius:.6rem;
   background:#1b0a10;box-shadow:0 0 26px rgba(230,184,80,.35),inset 0 0 22px rgba(0,0,0,.65);
 }
 .marquee::before,.marquee::after{
@@ -48,8 +48,7 @@ header{text-align:center;margin:0 auto 2.2rem;max-width:34rem}
 .marquee::before{top:.4rem}
 .marquee::after{bottom:.4rem;animation-delay:.8s}
 .now{margin:0 0 .3rem;font:600 .8rem/1 var(--serif);letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
-h1{font-size:clamp(1.8rem,7vw,2.9rem);font-weight:600;line-height:1.1;margin:0 0 .5rem;font-style:italic}
-header p{margin:0;opacity:.85;line-height:1.5}
+h1{font-size:clamp(1.8rem,7vw,2.9rem);font-weight:600;line-height:1.1;margin:0;font-style:italic}
 
 #grid{list-style:none;margin:0 auto;padding:0;max-width:46rem;display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
 @media (min-width:640px){#grid{grid-template-columns:repeat(6,1fr);gap:1rem}}
