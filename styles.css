@@ -5,11 +5,17 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+/* solid canvas colour so nothing white shows while mobile toolbars resize the viewport */
+html{background:#12050a;color-scheme:dark}
 body{
   min-height:100dvh; color:var(--snow); font-family:var(--serif);
-  /* cinema velvet: deep curtain red fading to a dark auditorium */
-  background:radial-gradient(ellipse at 50% -10%,#6b1426 0%,#35091a 42%,#12050a 100%) fixed;
   padding:0 1rem max(2rem,env(safe-area-inset-bottom));
+}
+/* cinema velvet: deep curtain red fading to a dark auditorium.
+   A fixed layer is more reliable on mobile than background-attachment:fixed */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% -10%,#6b1426 0%,#35091a 42%,#12050a 100%);
 }
 header,#grid{position:relative;z-index:1}
 
