@@ -195,8 +195,18 @@ const unlockDlg = el<HTMLDialogElement>("unlockDlg");
 const unlockPass = el<HTMLInputElement>("unlockPass");
 const unlockError = el<HTMLParagraphElement>("unlockError");
 
+// The eye button shows what has been typed, which helps when mistyping on a phone
+const revealPass = el<HTMLButtonElement>("revealPass");
+function showPassphrase(show: boolean): void {
+  unlockPass.type = show ? "text" : "password";
+  revealPass.setAttribute("aria-pressed", String(show));
+  revealPass.setAttribute("aria-label", show ? "Hide passphrase" : "Show passphrase");
+}
+revealPass.addEventListener("click", () => { showPassphrase(unlockPass.type === "password"); unlockPass.focus(); });
+
 el<HTMLFormElement>("unlockForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  showPassphrase(false);
   const ok = (await hashPassphrase(unlockPass.value, DATA.passphraseSalt)) === DATA.passphraseHash;
   unlockPass.value = "";
   if (!ok) { unlockError.hidden = false; unlockPass.focus(); return; }

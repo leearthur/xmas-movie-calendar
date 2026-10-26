@@ -40,7 +40,16 @@
   <form class="card unlock" id="unlockForm">
     <h2 id="unlockTitle">Who's testing?</h2>
     <p>Enter the curator's passphrase to see the real films, or carry on with made-up test films.</p>
-    <input type="password" id="unlockPass" autocomplete="off" aria-label="Curator's passphrase" placeholder="Curator's passphrase">
+    <div class="pass-field">
+      <input type="password" id="unlockPass" autocomplete="off" aria-label="Curator's passphrase" placeholder="Curator's passphrase">
+      <button type="button" class="reveal" id="revealPass" aria-label="Show passphrase" aria-pressed="false">
+        <svg class="eye" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+    </div>
     <p class="unlock-error" id="unlockError" role="alert" hidden>That passphrase isn't right.</p>
     <div class="buttons">
       <button type="button" class="secondary" id="useTestFilms">Use test films</button>
