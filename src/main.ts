@@ -117,17 +117,23 @@ function announce(text: string): void {
   window.setTimeout(() => { announcer.textContent = text; }, 50); // clearing first makes repeated messages get read again
 }
 
-// What a screen reader says for a door: its number and whether it can be opened
-function doorLabel(n: number): string {
-  if (opened.has(n)) return `Door ${n}, opened. Press to see the film again.`;
-  return isUnlocked(n) ? `Door ${n}, ready to open.` : `Door ${n}, locked until ${n} December.`;
-}
-
 // A festive picture revealed behind each door (the doors are shuffled, but door n always has the same picture)
 const PICTURES = [
   "⛄", "🧦", "🍪", "🔔", "🦌", "🎁", "❄️", "🕯️", "🍿", "🍬", "⭐", "🎶",
   "🎬", "🍷", "🥧", "🛷", "🧤", "🍫", "🏠", "👼", "🎀", "🍊", "🎅", "🎄",
 ];
+
+// What each picture shows, said aloud once the door is open (same order as PICTURES)
+const PICTURE_NAMES = [
+  "a snowman", "a Christmas stocking", "a cookie", "a bell", "a reindeer", "a present", "a snowflake", "a candle", "popcorn", "a sweet", "a star", "music notes",
+  "a clapper board", "a glass of wine", "a pie", "a sleigh", "a mitten", "a chocolate bar", "a house", "an angel", "a ribbon", "a tangerine", "Father Christmas", "a Christmas tree",
+];
+
+// What a screen reader says for a door: its number and whether it can be opened
+function doorLabel(n: number): string {
+  if (opened.has(n)) return `Door ${n}, opened. Behind it: ${PICTURE_NAMES[n - 1]}. Press to see the film again.`;
+  return isUnlocked(n) ? `Door ${n}, ready to open.` : `Door ${n}, locked until ${n} December.`;
+}
 
 for (const n of order) {
   const li = document.createElement("li");
